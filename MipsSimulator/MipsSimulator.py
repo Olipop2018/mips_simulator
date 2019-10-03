@@ -16,6 +16,13 @@ def main():
     f = open("mc.txt","w+")
     h = open("mips.asm","r")
     asm = h.readlines()
+    pc= int(0)
+    registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0, 
+                  "$12":0,"$13": 0, "$14":0,"$15": 0, "$16":0,"$17": 0, 
+                  "$18":0,"$19": 0, "$20":0,"$21": 0, "$22":0,"$23": 0, "$lo":0,"hi":0}
+        
+     
+        
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
         asm.remove('\n')
 
@@ -35,12 +42,20 @@ def main():
             else:
                 op= '001000'
             line = line.split(",")
-            imm = format(int(line[2]),'016b') if (int(line[2]) > 0) else format(65536 + int(line[2]),'016b')
-            rs = format(int(line[1]),'05b')
-            rt = format(int(line[0]),'05b')
-            hexh = (str(op) + str(rs) + str(rt) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write(hexh + '\n')#str(op) + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
+            imm = int(line[2]) if (int(line[2]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
+            rs = registers[("$" + str(line[1]))] # reads the value from specified register
+            rt = "$" + str(line[0]) # locate the register in which to write to
+            result = rs + imm # does the addition operation
+            registers[rt]= result # writes the value to the register specified
+            pc+= 4# increments pc by 4 
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
+           # hexh = (str(op) + str(rs) + str(rt) + str(imm)).split()
+           # hexh= hex(int(hexh[0], 2))
+           # f.write(hexh + '\n')#str(op) + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
 
 
         elif(line[0:2] == "lb"): # lb
