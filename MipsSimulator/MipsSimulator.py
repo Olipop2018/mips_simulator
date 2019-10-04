@@ -1,5 +1,5 @@
 def saveJumpLabel(asm,labelIndex, labelName):
-    8lineCount = 0
+    lineCount = 0
     for line in asm:
         line = line.replace(" ","")
         if(line.count(":")):
