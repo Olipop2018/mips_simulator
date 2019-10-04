@@ -65,7 +65,7 @@ skip_s: 	#Skip match success
 	addi $20, $20, 1	#Increment part B(ii)
 	
 skip_fr: 	#Skip Fold
-	lw $19, 0($9)		#Load
+	lbu $19, 0($9)		#Load
 	addi $18, $0, 4		#Reset multiplication factor + Counter
 	addi $10, $10, -1	#Decrement amount of times needed to loop
 	addi $9, $9, 4		#Next number
