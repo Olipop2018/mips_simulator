@@ -52,7 +52,7 @@ loop_mult:	#Loop mult/fold
 #Part B(ii) anaylsis
 	
 loop_pm:	#Loop pattern matching
-	sltu $21, $19, $22	#Check if less than since I know f8 = 11111000
+	sltiu $21, $19, $22	#Check if less than since I know f8 = 11111000
 	addi $18, $18, -1	#Decrement count
 	sll $19, $19, 1		#Shift left 1
 	sw $19, 0x201c($0)	
