@@ -1,5 +1,5 @@
 def saveJumpLabel(asm,labelIndex, labelName):
-    lineCount = 0
+    8lineCount = 0
     for line in asm:
         line = line.replace(" ","")
         if(line.count(":")):
@@ -16,13 +16,15 @@ def main():
     f = open("mc.txt","w+")
     h = open("mips.asm","r")
     asm = h.readlines()
-    pc= int(0)
+    pc = 0
     registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0, 
                   "$12":0,"$13": 0, "$14":0,"$15": 0, "$16":0,"$17": 0, 
                   "$18":0,"$19": 0, "$20":0,"$21": 0, "$22":0,"$23": 0, "$lo":0,"hi":0}
-        
-     
-        
+	
+	memory = [0] *4096 #Remember when ever you get an address in hex subtract 8192 from it then write to it
+    
+	DIC = 0				#Dynamic Instruction Count
+	
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
         asm.remove('\n')
 
