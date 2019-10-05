@@ -40,19 +40,16 @@ loop_mult:	#Loop mult/fold
 #Part B begins
 
 	addi $9, $9, 4		#Reset start address 0x2020
-	addi $17, $0, 0		#Initialize 0, Loading number
-	addi $18, $0, 4		#Multiplication factor + Counter
 	addi $19, $0, 0 	#To be SLL
 	addi $20, $0, 0 	#Part B(ii) number
 	addi $10, $0, 100	#Counter for 1-100 
 	addi $21, $0, 0		#Set counter
-	addi $22, $0, 0xf8	#11111000
 	addi $23, $0, 1		#BNE useful logic
 
 #Part B(ii) anaylsis
 	
 loop_pm:	#Loop pattern matching
-	sltu $21, $19, $22	#Check if less than since I know f8 = 11111000
+	sltiu $21, $19, 0xf8	#Check if less than since I know f8 = 11111000
 	addi $18, $18, -1	#Decrement count
 	sll $19, $19, 1		#Shift left 1
 	sw $19, 0x201c($0)	
@@ -65,7 +62,7 @@ skip_s: 	#Skip match success
 	addi $20, $20, 1	#Increment part B(ii)
 	
 skip_fr: 	#Skip Fold
-	lw $19, 0($9)		#Load
+	lbu $19, 0($9)		#Load
 	addi $18, $0, 4		#Reset multiplication factor + Counter
 	addi $10, $10, -1	#Decrement amount of times needed to loop
 	addi $9, $9, 4		#Next number
