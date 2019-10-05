@@ -17,14 +17,12 @@ def main():
     h = open("mips.asm","r")
     asm = h.readlines()
     pc = 0
+    memory = [0] *4096 #Remember when ever you get an address in hex subtract 8192 from it then write to it
+    DIC = 0				#Dynamic Instruction Count
     registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0, 
                   "$12":0,"$13": 0, "$14":0,"$15": 0, "$16":0,"$17": 0, 
                   "$18":0,"$19": 0, "$20":0,"$21": 0, "$22":0,"$23": 0, "$lo":0,"hi":0}
-	
-	memory = [0] *4096 #Remember when ever you get an address in hex subtract 8192 from it then write to it
-    
-	DIC = 0				#Dynamic Instruction Count
-	
+
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
         asm.remove('\n')
 
@@ -55,11 +53,6 @@ def main():
             print(pc)
             print(pcprint)
 
-           # hexh = (str(op) + str(rs) + str(rt) + str(imm)).split()
-           # hexh= hex(int(hexh[0], 2))
-           # f.write(hexh + '\n')#str(op) + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
-
-
         elif(line[0:2] == "lb"): # lb
             line = line.replace("lb","")
             line = line.replace(")","")
@@ -72,9 +65,7 @@ def main():
             imm = format(int(line[1],n),'016b') if (int(line[1],n) > 0) else format(65536 + int(line[1],n),'016b')
             rs = format(int(line[2]),'05b')
             rt = format(int(line[0]),'05b')
-            hexh = (str('100000') + str(rs) + str(rt) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write( hexh + '\n')#str('100000') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
+            
         
         elif(line[0:2] == "sb"): # sb
             line = line.replace("sb","")
@@ -88,9 +79,7 @@ def main():
             imm = format(int(line[1],n),'016b') if (int(line[1],n) > 0) else format(65536 + int(line[1],n),'016b')
             rs = format(int(line[2]),'05b')
             rt = format(int(line[0]),'05b')
-            hexh = (str('101000') + str(rs) + str(rt) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write(hexh + '\n')#str('101000') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')        
+            
        
         elif(line[0:2] == "lw"): # lw
             line = line.replace("lw","")
@@ -104,9 +93,7 @@ def main():
             imm = format(int(line[1],n),'016b') if (int(line[1],n) > 0) else format(65536 + int(line[1],n),'016b')
             rs = format(int(line[2]),'05b')
             rt = format(int(line[0]),'05b')
-            hexh = (str('100011') + str(rs) + str(rt) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write( hexh + '\n')#str('100011') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')        
+                
        
         elif(line[0:2] == "sw"): # sw
             line = line.replace("sw","")
@@ -118,13 +105,16 @@ def main():
             else:
                 n=10
             imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
-            rs = int(registers[("$" + str(line[2]))], n)
+            rs = int(registers[("$" + str(line[2]))])
             rt = registers[("$" + str(line[0]))]
-
-
-            hexh = (str('101011') + str(rs) + str(rt) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write( hexh + '\n')#str('101011') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')        
+            mem= imm + rs
+            mem = mem - int('0x2000', n)
+            memory[mem] = rt
+            pc+= 4# increments pc by 4 
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)  
        
         elif(line[0:3] == "beq"): # beq
             line = line.replace("beq","")
@@ -132,25 +122,37 @@ def main():
             for i in range(len(labelName)):
                     if(labelName[i] == line[2]):
                        lpos = int(labelIndex[i])- bcount if(bcount < int(labelIndex[i])) else int(labelIndex[i])-bcount
-                       imm= format(int(lpos),'016b') if (int(lpos) > 0) else format(65536 + int(lpos),'016b')
-            rs = format(int(line[1]),'05b')
-            rt = format(int(line[0]),'05b')
-            hexh = (str('000100') + str(rt)+str(rs) + str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write(hexh + '\n')#str('000100') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
-       
+                       imm= int(lpos)
+            rs = registers[("$" + str(line[1]))]
+            rt = registers[("$" + str(line[0]))]
+            if(rs == rt):
+                 pc+= 4
+                 pc+= (imm << 2)
+            else:
+                pc+= 4
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
         elif(line[0:3] == "bne"): # bne
             line = line.replace("bne","")
             line = line.split(",")
             for i in range(len(labelName)):
                     if(labelName[i] == line[2]):
                        lpos = int(labelIndex[i])- bcount if(bcount < int(labelIndex[i])) else int(labelIndex[i])-bcount
-                       imm= format(int(lpos),'016b') if (int(lpos) > 0) else format(65536 + int(lpos),'016b')
-            rs = format(int(line[1]),'05b')
-            rt = format(int(line[0]),'05b')
-            hexh = (str('000101') + str(rt)+ str(rs) +  str(imm)).split()
-            hexh= hex(int(hexh[0], 2))
-            f.write(hexh + '\n')#str('000101') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')
+                       imm= int(lpos) 
+            rs = registers[("$" + str(line[1]))]
+            rt = registers[("$" + str(line[0]))]
+            if(rs != rt):
+                 pc+= 4
+                 pc+= (imm << 2)
+            else:
+                pc+= 4
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
 
         elif(line[0:3] == "add"): # ADD
             line = line.replace("add","")
@@ -158,21 +160,35 @@ def main():
             rd = format(int(line[0]),'05b')
             rs = format(int(line[1]),'05b')
             rt = format(int(line[2]),'05b')
-            hexh = (str('000000') + str(rs) + str(rt) + str(rd) + str('00000100000')).split()
-            hexh= hex(int(hexh[0], 2))
-            hexh= format(int(hexh, 16), '08x' )
-            f.write('0x'+ hexh + '\n')#str('000000') + str(rs) + str(rt) + str(rd) + str('00000100000') + '\n' + '0x'+hexh+ '\n')
+          
             
         elif(line[0:3] == "srl"): # SRL
             line = line.replace("srl","")
             line = line.split(",")
-            rd = format(int(line[0]),'05b')
-            rt = format(int(line[1]),'05b')
-            shamt = format(int(line[2]),'05b')
-            hexh = (str('000000') + str('00000') + str(rt) + str(rd) + str(shamt+'000010')).split()
-            hexh= hex(int(hexh[0], 2))
-            hexh= format(int(hexh, 16), '08x' )
-            f.write('0x'+ hexh + '\n')#str('000000') + str('00000') + str(rt) + str(rd) + str(shamt +'000010') + '\n' + '0x'+hexh+ '\n')
+            rd = "$" + str(line[0])
+            rt = registers[("$" + str(line[1]))]
+            shamt = int(line[2])
+            result = rt >> shamt # does the addition operation
+            registers[rd]= result
+            pc+= 4# increments pc by 4 
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+        
+        elif(line[0:3] == "sll"): # SLL
+            line = line.replace("sll","")
+            line = line.split(",")
+            rd = "$" + str(line[0])
+            rt = registers[("$" + str(line[1]))]
+            shamt = int(line[2])
+            result = rt << shamt # does the addition operation
+            registers[rd]= result
+            pc+= 4 # increments pc by 4 
+            pcprint =  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
                        
         elif(line[0:3] == "slt"): # SLT/U
             line = line.replace("slt","")
@@ -185,10 +201,7 @@ def main():
             rd = format(int(line[0]),'05b')
             rs = format(int(line[1]),'05b')
             rt = format(int(line[2]),'05b')
-            hexh = (str('000000') + str(rs) + str(rt) + str(rd) + str('00000'+op)).split()
-            hexh= hex(int(hexh[0], 2))
-            hexh= format(int(hexh, 16), '08x' )
-            f.write('0x'+ hexh + '\n')#str('000000') + str(rs) + str(rt) + str(rd) + str('00000'+ op) + '\n' + '0x'+hexh+ '\n')
+            
             
         elif(line[0:4] == "mult"): # MULT/U
             line = line.replace("mult","")
@@ -200,11 +213,22 @@ def main():
             line = line.split(",")
             rs = format(int(line[0]),'05b')
             rt = format(int(line[1]),'05b')
-            hexh = (str('000000') + str(rs) + str(rt) + str('0000000000'+ op)).split()
-            hexh= hex(int(hexh[0], 2))
-            hexh= format(int(hexh, 16), '08x' )
-            f.write('0x'+ hexh + '\n')#str('000000') + str(rs) + str(rt) + str('0000000000'+ op) + '\n' + '0x'+hexh+ '\n')
-            
+           
+
+        elif(line[0:3] == "xor"): # XOR
+            line = line.replace("xor","")
+            line = line.split(",")
+            rd = "$" + str(line[0])
+            rs = registers[("$" + str(line[1]))]
+            rt = registers[("$" + str(line[2]))]
+            result = rs ^ rt # does the addition operation
+            registers[rd]= result
+            pc+= 4 # increments pc by 4 
+            pcprint =  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
         elif(line[0:1] == "j"): # JUMP
             line = line.replace("j","")
             line = line.split(",")
