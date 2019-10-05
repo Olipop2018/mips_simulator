@@ -115,9 +115,11 @@ def main():
                 n=16
             else:
                 n=10
-            imm = format(int(line[1],n),'016b') if (int(line[1],n) > 0) else format(65536 + int(line[1],n),'016b')
-            rs = format(int(line[2]),'05b')
-            rt = format(int(line[0]),'05b')
+            imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
+            rs = int(registers[("$" + str(line[2]))], n)
+            rt = registers[("$" + str(line[0]))]
+
+
             hexh = (str('101011') + str(rs) + str(rt) + str(imm)).split()
             hexh= hex(int(hexh[0], 2))
             f.write( hexh + '\n')#str('101011') + str(rs) + str(rt) + str(imm) + '\n'+ hexh+ '\n')        
