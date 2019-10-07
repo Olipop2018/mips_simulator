@@ -34,6 +34,7 @@ def main():
         line = line.replace(" ","")
         line = line.replace("zero","0") # assembly can also use both $zero and $0
         bcount+=1
+		
         if(line[0:4] == "addi"): # ADDI/U 
             line = line.replace("addi","")
             if(line[0:1] == "u"):
@@ -52,23 +53,23 @@ def main():
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
-        elif(line[0:3] == "lui"): #lui 
-                line = line.replace("lui","")
-                op = '001111'
-                line = line.split(",")
-                imm = int(line[1]) if (int(line[1]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
-                rd = "$" + str(line[0]) # locate the register in which to write to
-                imm = imm << 16
-                registers[rd] = immm 		#Write upper imm to rd designation
-                pc += 4# increments pc by 4 
-                pcprint = hex(pc)
-                print(registers)# print all the registers and their values (testing purposes to see what is happening)
-                print(pc)
-                print(pcprint)
+			
+		elif(line[0:3] == "lui"): #lui 
+            line = line.replace("lui","")
+            op = '001111'
+            line = line.split(",")
+            imm = int(line[1]) if (int(line[1]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
+            rd = "$" + str(line[0]) # locate the register in which to write to
+			imm = imm << 16
+            registers[rd] = immm 		#Write upper imm to rd designation
+            pc += 4# increments pc by 4 
+            pcprint = hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
 
-
-        elif(line[0:2] == "lb"): # lb
-            line = line.replace("lb","")
+        elif(line[0:3] == "lbu"): # lbu
+            line = line.replace("lbu","")
             line = line.replace(")","")
             line = line.replace("(",",")
             line = line.split(",")
@@ -76,10 +77,17 @@ def main():
                 n=16
             else:
                 n=10
-            imm = format(int(line[1],n),'016b') if (int(line[1],n) > 0) else format(65536 + int(line[1],n),'016b')
-            rs = format(int(line[2]),'05b')
-            rt = format(int(line[0]),'05b')
-            
+            imm = format(int(line[1],n),'016b')
+            rs = int(registers[("$" + str(line[2]))])
+            rt = registers[("$" + str(line[0]))]
+			mem = imm + rs
+            mem = mem - int('0x2000', 16)
+			register[rt] = memory[mem]
+            pc += 4# increments pc by 4 
+            pcprint = hex(pc)
+			print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
         
         elif(line[0:2] == "sb"): # sb
             line = line.replace("sb","")
@@ -121,7 +129,7 @@ def main():
             imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
             rs = int(registers[("$" + str(line[2]))])
             rt = registers[("$" + str(line[0]))]
-            mem= imm + rs
+            mem = imm + rs
             mem = mem - int('0x2000', n)
             memory[mem] = rt
             pc+= 4# increments pc by 4 
@@ -227,36 +235,38 @@ def main():
             line = line.split(",")
             rs = registers[("$" + str(line[0]))]	#First register
             rt = registers[("$" + str(line[1]))]	#Second register
-            temp = rs * rt	#Multiply
-            registers[{"$hi"}] = temp << 32		#Shift high right 32
-            registers[{"$hi"}] = registers[{"$hi"}] >> 32	#Shift back 32
-            registers[{"$lo"}] = temp >> 32	#Shift low left 32
-            pc += 4# increments pc by 4 
-            pcprint =  hex(pc)
-            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+			
+			temp = rs * rt	#Multiply
+			registers[{"$hi"}] = temp << 32		#Shift high right 32
+			registers[{"$hi"}] = registers[{"$hi"}] >> 32	#Shift back 32
+			registers[{"$lo"}] = temp >> 32	#Shift low left 32
+			
+			pc += 4# increments pc by 4 
+			pcprint =  hex(pc)
+			print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
-       
-        elif(line[0:4] == "mflo"): #MFLO
+			
+		elif(line[0:4] == "mflo"): #MFLO
             line = line.replace("mflo","")
             op = '001010'
             line = line.split(",")
             rs = "$" + str(line[0])		#Register to write to
-            registers[rs] = registers[{"$lo"}]	#Write value to register
-            pc += 4# increments pc by 4 
-            pcprint =  hex(pc)
-            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+			registers[rs] = registers[{"$lo"}]	#Write value to register
+			pc += 4# increments pc by 4 
+			pcprint =  hex(pc)
+			print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
-           
-        elif(line[0:4] == "mfhi"): #MFHI
+			
+		elif(line[0:4] == "mfhi"): #MFHI
             line = line.replace("mfhi","")
-            op = '001000'
+			op = '001000'
             line = line.split(",")
             rd = "$" + str(line[0])		#Register to write to
-            registers[rd] = registers[{"$hi"}]	#Write value to register
-            pc += 4# increments pc by 4 
-            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+			registers[rd] = registers[{"$hi"}]	#Write value to register
+			pc += 4# increments pc by 4 
+			print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
 
