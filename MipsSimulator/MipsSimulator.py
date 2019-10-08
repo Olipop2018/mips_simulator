@@ -53,8 +53,8 @@ def main():
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
-			
-		elif(line[0:3] == "lui"): #lui 
+
+	elif(line[0:3] == "lui"): #lui 
             line = line.replace("lui","")
             op = '001111'
             line = line.split(",")
@@ -304,6 +304,55 @@ def main():
                         hexstr= (str('000010') + str(format(int(labelIndex[i]),'026b'))).split()
                         hexstr= hex(int(hexstr[0], 2))
                         f.write(hexstr+ '\n')#str('000010') + str(format(int(labelIndex[i]),'026b')) + '\n'+ hexstr+ '\n')
+
+        elif(line[0:6] == "ori"): # ORI 
+            line = line.replace("ori","")
+            op = '001101'
+            line = line.split(",")
+            imm = int(line[2]) if (int(line[2]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and nega			tive will get the unsigned value of th negative integer.
+            rs = registers[("$" + str(line[1]))] # reads the value from specified register
+            rt = "$" + str(line[0]) # locate the register in which to write to
+            result = rs | imm # does the or imm operation
+            registers[rt]= result # writes the value to the register specified
+            pc += 4# increments pc by 4 
+            pcprint = hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
+        elif(line[0:6] == "sltiu"): # SLTIU 
+            line = line.replace("sltiu","")
+            op = '001011'
+            line = line.split(",")
+            imm = int(line[2]) if (int(line[2]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and nega			tive will get the unsigned value of th negative integer.
+            rs = registers[("$" + str(line[1]))] # reads the value from specified register
+            rt = "$" + str(line[0]) # locate the register in which to write to
+            if(rs < imm): 
+                registers[rt]= 1 # writes the value to the register specified
+            else:
+                registers[rt]= 0
+            pc += 4# increments pc by 4 
+            pcprint = hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
+        elif(line[0:6] == "andi"): # ANDI 
+            line = line.replace("andi","")
+            op = '001100'
+            line = line.split(",")
+            imm = int(line[2]) if (int(line[2]) > 0 or op == '001000') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and nega			tive will get the unsigned value of th negative integer.
+            rs = registers[("$" + str(line[1]))] # reads the value from specified register
+            rt = "$" + str(line[0]) # locate the register in which to write to
+            result = rs & imm # does the and operation
+            registers[rt]= result # writes the value to the register specified
+            pc += 4# increments pc by 4 
+            pcprint = hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
+
 
     f.close()
 
