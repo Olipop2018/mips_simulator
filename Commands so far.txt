@@ -21,4 +21,33 @@ and: &
 example: (a & b) (means 0000 1100)
 or: |
 example: (a | b) = 61 (means 0011 1101)
-Special Insrtuction[TBD]
+Special Insrtuction 'fold' r-type instruction $rd, $rs, $rt
+
+fold $rd, $rs, $rt
+multu $rt, $rs
+mflo $at
+mfhi $rd
+xor $rd, $rd, $at
+multu $rt ,$rs
+mflo $at
+mfhi $rd
+xor $rd, $rd, $at
+multu $rd, $rs
+mflo $at
+mfhi $rd
+xor $rd, $rd, $at
+multu $rd ,$rs
+mflo $at
+mfhi $rd
+xor $11, $11, $at
+multu $rd ,$rs
+mflo $at
+mfhi $rd
+xor $rd, $rd, $at
+
+srl $at, $rd, 16
+andi $rd, $rd, 0xFFFF
+xor $rd, $at, $rd
+srl $at, $rd, 8
+andi $rd, $rd, 0xFF
+xor $rd, $at, $rd
