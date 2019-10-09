@@ -51,3 +51,24 @@ xor $rd, $at, $rd
 srl $at, $rd, 8
 andi $rd, $rd, 0xFF
 xor $rd, $at, $rd
+
+addi $lo, $11, 0 = checked number
+xor $hi, $hi, $hi = counter
+sltiu $hi, $lo, 0xf8
+sll $lo, $lo, 1
+lbu $lo, 0($lo)
+sltiu $hi, $lo, 0xf8(Or $hi)
+sll $lo, $lo, 1
+lbu $lo, 0($lo)
+sltiu $hi, $lo, 0xf8(Or $hi)
+sll $lo, $lo, 1
+lbu $lo, 0($lo)
+sltiu $hi, $lo, 0xf8(Or $hi)
+sll $lo, $lo, 1
+lbu $lo, 0($lo)
+END
+
+OUTSIDE
+sw $11, 0($9)
+mthi $12
+addi $13, $12, $13
