@@ -5,6 +5,9 @@ registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0,
                   "$18":0,"$19": 0, "$20":0,"$21": 0, "$22":0,"$23": 0, "$lo":0,"$hi":0}
 labelIndex = []
 labelName = []
+def HashAndMatch():
+    f= 0
+
 
 def instrSimulation(instrs):
    pc = int(0)
@@ -350,3 +353,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

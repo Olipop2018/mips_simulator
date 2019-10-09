@@ -4,3 +4,6 @@ MipsSimulator/MipsSimulator.sln
 MipsSimulator/.vs/MipsSimulator/v16/.suo
 MipsSimulator/mc.txt
 MipsSimulator/mips.asm
+MipsSimulator/MIPS-plus-sim.py/.vs/MIPS-plus-sim.py/v16/.suo
+MipsSimulator/MIPS-plus-sim.py/MIPS-plus-sim.py.pyproj
+MipsSimulator/MIPS-plus-sim.py/MIPS-plus-sim.py.sln
