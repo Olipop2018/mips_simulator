@@ -1,0 +1,27 @@
+#ECE-366 Project 1
+#Author: Joseph Riem, Olivier
+
+#Required commands
+	lui $8, 0xFA19
+	ori $8, $8, 0xE366	#$8 = B
+
+#Code begins
+	addi $9, $0, 0x21ac	#Origin 
+	addi $10, $0, 100	#Counter for 1-100 
+	addi $14, $10, 0	#A
+	addi $20, $0, 0 	#Part B(ii) number
+
+loop_mult:	#Loop mult/fold
+	cfold $14, $8, $14
+	
+#Store
+	mflo $14
+	sw $14, 0($9)		#Store
+	mthi $12
+	add $20, $12, $20
+	addi $9, $9, -4		#Decrement address
+	addi $10, $10, -1	#Decrement counter/value
+	addi $14, $10, 0	#Reset A
+	bne $10, $0, loop_mult	#If $10 /= 0 loop
+	
+	sw $20, 0x2008($0)	#Store pattern matching
