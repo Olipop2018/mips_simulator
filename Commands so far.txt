@@ -16,6 +16,12 @@ xor [0:6] = '000000' | [6:11] = 'rs' | [11:16] = 'rt' | [16:21] = 'rd' | [21:26]
 srl [0:6] = '000000' | [6:11] = '00000' | [11:16] = 'rt' | [16:21] = 'rd' | [21:26] 'sa' | [26:32] = '000010' = Olivier(Done)
 sll [0:6] = '000000' | [6:11] = '00000' | [11:16] = 'rt' | [16:21] = 'rd' | [21:26] 'sa' | [26:32] = '000000' = Olivier(Done)
 
+Final instructions with testcse.asm
+ADD
+SB
+J
+LB
+
 bitwise operation
 and: & 
 example: (a & b) (means 0000 1100)
@@ -23,7 +29,7 @@ or: |
 example: (a | b) = 61 (means 0011 1101)
 Special Insrtuction 'fold' r-type instruction $rd, $rs, $rt
 
-fold $rd, $rs, $rt
+cfold $rd, $rs, $rt
 multu $rt, $rs
 mflo $at
 mfhi $rd
