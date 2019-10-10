@@ -1,5 +1,5 @@
 memory = [0] *4096 #Remember when ever you get an address in hex subtract 8192 from it then write to it
-DIC = 0				#Dynamic Instruction Count
+				#Dynamic Instruction Count
 registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0, 
                   "$12":0,"$13": 0, "$14":0,"$15": 0, "$16":0,"$17": 0, 
                   "$18":0,"$19": 0, "$20":0,"$21": 0, "$22":0,"$23": 0, "$lo":0,"$hi":0}
@@ -8,6 +8,7 @@ labelName = []
 def instrSimulation(instrs):
    pc = int(0)
    bcount=0
+   DIC = int(0)
    while True:
         bcount+=1
         if (int(pc/4) > len(instrs)):
@@ -27,7 +28,7 @@ def instrSimulation(instrs):
             result = rs + imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc += 4# increments pc by 4 
-            DIC+=1
+            DIC +=1 
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -367,10 +368,8 @@ def saveJumpLabel(asm,labelIndex, labelName):
         asm.remove('\n')
 
 def main():
-    labelIndex = []
-    labelName = []
     f = open("mc.txt","w+")
-    h = open("testcase.asm","r")
+    h = open("mips.asm","r")
     asm = h.readlines()
     instrs = []
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
