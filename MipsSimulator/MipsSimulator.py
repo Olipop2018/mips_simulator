@@ -27,6 +27,7 @@ def instrSimulation(instrs):
             result = rs + imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc += 4# increments pc by 4 
+            DIC+=1
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -40,6 +41,7 @@ def instrSimulation(instrs):
             imm = imm << 16
             registers[rd] = immm #Write upper imm to rd designation
             pc += 4# increments pc by 4 
+            DIC+=1
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -54,13 +56,14 @@ def instrSimulation(instrs):
                 n=16
             else:
                 n=10
-            imm = format(int(line[1],n),'016b')
+            imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
             rs = int(registers[("$" + str(line[2]))])
             rt = registers[("$" + str(line[0]))]
             mem = imm + rs
             mem = mem - int('0x2000', 16)
-            register[rt] = memory[mem]
+            register[rt] = int(memory[mem]) if (int(memory[mem]) > 0) else 65536 + int(memory[mem])
             pc += 4# increments pc by 4 
+            DIC+=1
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -83,6 +86,7 @@ def instrSimulation(instrs):
             mem = mem - int('0x2000', n)
             memory[mem] = rt
             pc+= 4# increments pc by 4 
+            DIC+=1
             pcprint=  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -103,6 +107,7 @@ def instrSimulation(instrs):
                  bcount+=1
             else:
                 pc+= 4
+            DIC+=1
             pcprint=  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -123,6 +128,7 @@ def instrSimulation(instrs):
                  bcount=0
             else:
                 pc+= 4
+            DIC+=1
             pcprint=  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -137,6 +143,7 @@ def instrSimulation(instrs):
             result = rt >> shamt # does the addition operation
             registers[rd]= result
             pc+= 4# increments pc by 4 
+            DIC+=1
             pcprint=  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -151,6 +158,7 @@ def instrSimulation(instrs):
             result = rt << shamt # does the addition operation
             registers[rd]= result
             pc += 4 # increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -166,11 +174,28 @@ def instrSimulation(instrs):
             line = line.split(",")
             rs = registers[("$" + str(line[0]))]	#First register
             rt = registers[("$" + str(line[1]))]	#Second register
+            rs= int(rs) if (int(rs) > 0 or op == '011000') else (65536 + int(rs))
+            rt= int(rt) if (int(rt) > 0 or op == '011000') else (65536 + int(rt))
             temp = rs * rt	#Multiply
-            registers[{"$hi"}] = temp << 32		#Shift high right 32
-            registers[{"$hi"}] = registers[{"$hi"}] >> 32	#Shift back 32
-            registers[{"$lo"}] = temp >> 32	#Shift low left 32
+            registers["$hi"] = temp << 32		#Shift high right 32
+            registers["$hi"] = registers[{"$hi"}] >> 32	#Shift back 32
+            registers["$lo"] = temp >> 32	#Shift low left 32
             pc += 4# increments pc by 4 
+            DIC+=1
+            pcprint =  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint) 
+
+        elif(line[0:5] == "cfold"): # CFOLD
+            line = line.replace("cfold","")
+            line = line.split(",")
+            rs = registers[("$" + str(line[1]))]	#First register
+            rt = registers[("$" + str(line[2]))]	#Second register
+            temp = rs * rt	#Multiply
+            HashAndMatch(rs, rt)
+            pc += 4# increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -183,6 +208,7 @@ def instrSimulation(instrs):
             rs = "$" + str(line[0])		#Register to write to
             registers[rs] = registers[{"$lo"}]	#Write value to register
             pc += 4# increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -195,6 +221,7 @@ def instrSimulation(instrs):
             rd = "$" + str(line[0])		#Register to write to
             registers[rd] = registers[{"$hi"}]	#Write value to register
             pc += 4# increments pc by 4 
+            DIC+=1
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
@@ -213,6 +240,7 @@ def instrSimulation(instrs):
             result = rs < imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc += 4 # increments pc by 4 
+            DIC+=1
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -227,6 +255,7 @@ def instrSimulation(instrs):
             result = rs ^ rt # does the addition operation
             registers[rd]= result
             pc+= 4 # increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -241,6 +270,7 @@ def instrSimulation(instrs):
             result = rs | imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc+= 4 # increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -255,6 +285,7 @@ def instrSimulation(instrs):
             result = rs & imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc+= 4 # increments pc by 4 
+            DIC+=1
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -263,7 +294,7 @@ def instrSimulation(instrs):
         elif(line[0:1] == "j"): # JUMP
             line = line.replace("j","")
             line = line.split(",")
-
+            DIC+=1
             # Since jump instruction has 2 options:
             # 1) jump to a label
             # 2) jump to a target (integer)
@@ -280,9 +311,6 @@ def instrSimulation(instrs):
                         hexstr= (str('000010') + str(format(int(labelIndex[i]),'026b'))).split()
                         hexstr= hex(int(hexstr[0], 2))
                         f.write(hexstr+ '\n')#str('000010') + str(format(int(labelIndex[i]),'026b')) + '\n'+ hexstr+ '\n')
-
-
-
 
 
 def saveJumpLabel(asm,labelIndex, labelName):
