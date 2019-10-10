@@ -12,10 +12,10 @@
 	addi $20, $0, 0 	#Part B(ii) number
 
 loop_mult:	#Loop mult/fold
-	#cfold $14, $8, $14
-	addi $0, $0, 0
+	cfold $14, $8, $14
 	
 #Store
+	mflo $14
 	sw $14, 0($9)		#Store
 	mthi $12
 	add $20, $12, $20
