@@ -152,7 +152,7 @@ def instrSimulation(instrs):
             if(rs != rt):
                  pc+= 4
                  pc+= (imm << 2)
-                 bcount=0
+                 bcount= int(pc/4)
             else:
                 pc+= 4
             DIC+=1
