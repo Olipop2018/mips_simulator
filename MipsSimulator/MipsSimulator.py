@@ -47,16 +47,21 @@ def instrSimulation(instrs):
             print(pc)
             print(pcprint)
 
-        elif(line[0:3] == "lbu"): # lbu
-            line = line.replace("lbu","")
+        elif(line[0:2] == "lb"): # lbu
+            line = line.replace("lb","")
             line = line.replace(")","")
             line = line.replace("(",",")
+            if(line[0:1] == "u"):
+               line = line.replace("u","")
+               op = '100100'
+            else:
+                op = '100000'
             line = line.split(",")
             if(line[1][0:2]== "0x"):
                 n=16
             else:
                 n=10
-            imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
+            imm = int(line[1],n) if (int(line[1],n) > 0 or op == '100000') else 65536 + int(line[1],n)
             rs = int(registers[("$" + str(line[2]))])
             rt = registers[("$" + str(line[0]))]
             mem = imm + rs
@@ -68,10 +73,31 @@ def instrSimulation(instrs):
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
-        
        
         elif(line[0:2] == "sw"): # sw
             line = line.replace("sw","")
+            line = line.replace(")","")
+            line = line.replace("(",",")
+            line = line.split(",")
+            if(line[1][0:2]== "0x"):
+                n=16
+            else:
+                n=10
+            imm = int(line[1],n) if (int(line[1],n) > 0) else 65536 + int(line[1],n)
+            rs = int(registers[("$" + str(line[2]))])
+            rt = registers[("$" + str(line[0]))]
+            mem = imm + rs
+            mem = mem - int('0x2000', n)
+            memory[mem] = rt
+            pc+= 4# increments pc by 4 
+            DIC+=1
+            pcprint=  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)  
+           
+        elif(line[0:2] == "sb"): # sw
+            line = line.replace("sb","")
             line = line.replace(")","")
             line = line.replace("(",",")
             line = line.split(",")
@@ -260,6 +286,21 @@ def instrSimulation(instrs):
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
             print(pcprint)
+       
+        elif(line[0:3] == "add"): # ADD
+            line = line.replace("add","")
+            line = line.split(",")
+            rd = "$" + str(line[0])
+            rs = registers[("$" + str(line[1]))]
+            rt = registers[("$" + str(line[2]))]
+            result = rs + rt # does the addition operation
+            registers[rd]= result
+            pc+= 4 # increments pc by 4 
+            DIC+=1
+            pcprint =  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
         
         elif(line[0:3] == "ori"): # ori
             line = line.replace("ori","")
@@ -301,16 +342,16 @@ def instrSimulation(instrs):
             # We need to save the label destination and its target location
 
             if(line[0].isdigit()): # First,test to see if it's a label or a integer
-                hexstr= (str('000010') + str(format(int(line[0]),'026b'))).split()
-                hexstr= hex(int(hexstr[0], 2))
-                f.write(hexstr + '\n')#str('000010') + str(format(int(line[0]),'026b')) + '\n'+ hexstr+ '\n')
+                pc= int(line[0])
+               # hexstr= hex(int(hexstr[0], 2))
+               # f.write(hexstr + '\n')#str('000010') + str(format(int(line[0]),'026b')) + '\n'+ hexstr+ '\n')
 
             else: # Jumping to label
                 for i in range(len(labelName)):
                     if(labelName[i] == line[0]):
-                        hexstr= (str('000010') + str(format(int(labelIndex[i]),'026b'))).split()
-                        hexstr= hex(int(hexstr[0], 2))
-                        f.write(hexstr+ '\n')#str('000010') + str(format(int(labelIndex[i]),'026b')) + '\n'+ hexstr+ '\n')
+                        pc= int(labelIndex[i])
+                        #hexstr= hex(int(hexstr[0], 2))
+                       # f.write(hexstr+ '\n')#str('000010') + str(format(int(labelIndex[i]),'026b')) + '\n'+ hexstr+ '\n')
 
 
 def saveJumpLabel(asm,labelIndex, labelName):
@@ -329,7 +370,7 @@ def main():
     labelIndex = []
     labelName = []
     f = open("mc.txt","w+")
-    h = open("mips.asm","r")
+    h = open("testcase.asm","r")
     asm = h.readlines()
     instrs = []
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
