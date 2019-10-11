@@ -39,7 +39,6 @@ def instrSimulation(instrs):
             result = rs + imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             pc += 4# increments pc by 4 
-              
             pcprint = hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -118,7 +117,6 @@ def instrSimulation(instrs):
             rt= int(rt,2)
             memory[mem] = rt
             pc+= 4# increments pc by 4 
-             
             pcprint=  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -223,7 +221,6 @@ def instrSimulation(instrs):
             result = int(result[32:],2)
             registers[rd]= result
             pc += 4 # increments pc by 4 
-             
             pcprint =  hex(pc)
             print(registers)# print all the registers and their values (testing purposes to see what is happening)
             print(pc)
@@ -421,7 +418,7 @@ def saveJumpLabel(asm,labelIndex, labelName):
 
 def main():
    # f = open("mc.txt","w+")
-    h = open("Hash-MIPS-default.asm","r")
+    h = open("testcase.asm","r")
     asm = h.readlines()
     instrs = []
    
