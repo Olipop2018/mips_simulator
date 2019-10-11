@@ -6,6 +6,26 @@ registers = {"$0": 0, "$8":0,"$9": 0, "$10":0,"$11": 0,
 labelIndex = []
 labelName = []
 pcAssign= []
+def HashAndMatch(A,B):
+    for i in range(0, 5):
+        tmp = A * B
+        tmp= format(tmp,'064b')
+        hi2=  int(tmp[:32],2)
+        lo2=  int(tmp[32:],2)   
+        A = hi2 ^ lo2
+    A= format(A,'032b')
+    C= int(A[16:32],2) ^ int(A[:16],2)
+    C= format(C,'016b')
+    C=  int(C[8:16],2) ^ int(C[:8],2)
+   # now does pattern matachin of C
+    C= format(C,'08b')
+    if ('11111' in C):
+        n=1
+    else:
+        n=0
+    registers["$hi"] = n		#Shift high right 32
+    registers["$lo"] = int(C,2)
+
 
 def instrSimulation(instrs):
    pc = int(0)
@@ -76,11 +96,11 @@ def instrSimulation(instrs):
             rt = registers[("$" + str(line[0]))]
             mem = imm + rs
             mem = mem - int('0x2000', 16)
-            rt= format(rt,'032b')
-            first= rt[:8]
-            sec= rt[8:16]
-            third= rt[16:24]
-            rt= rt[24:32]
+            rt= format(rt,'064b')
+            first= rt[:32]
+            sec= rt[32:40]
+            third= rt[40:48]
+            rt= rt[56:64]
             first= int(first,2)
             sec= int(sec,2)
             third= int(third,2)
@@ -143,7 +163,7 @@ def instrSimulation(instrs):
             mem = mem - int('0x2000', 16)
             temp3 = int(memory[mem]) if (int(memory[mem]) > 0 or op == '100000') else (65536 + int(memory[mem]))
             temp3 = format(temp3, '08b')
-            temp3 = int(temp3,2)
+            temp3 = int(temp3[:8],2)
             registers[rt] = temp3
             pc += 4# increments pc by 4 
              
@@ -226,6 +246,20 @@ def instrSimulation(instrs):
             print(pc)
             print(pcprint)     
             
+        elif(line[0:5] == "cfold"): # CFOLD
+            line = line.replace("cfold","")
+            line = line.split(",")
+            rs = registers[("$" + str(line[1]))]	#First register
+            rt = registers[("$" + str(line[2]))]	#Second register
+            temp = rs * rt	#Multiply
+            HashAndMatch(rt, rs)
+            pc += 4# increments pc by 4 
+            DIC+=1
+            pcprint =  hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
         elif(line[0:4] == "mult"): # MULT/U
             line = line.replace("mult","")
             if(line[0:1] == "u"):
@@ -291,8 +325,7 @@ def instrSimulation(instrs):
             imm = int(line[2],n) if (int(line[2],n) > 0 or op == '001010') else (65536 + int(line[2],n)) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
             rs = registers[("$" + str(line[1]))] # reads the value from specified register
             rt = "$" + str(line[0]) # locate the register in which to write to
-            temp = format(rs,'08b')
-            rs = int(temp[:8],2)
+
             if(rs < imm):
                 result = 1
             else:
@@ -420,7 +453,7 @@ def saveJumpLabel(asm,labelIndex, labelName):
 
 def main():
    # f = open("mc.txt","w+")
-    h = open("Hash-MIPS-default.asm","r")
+    h = open("testcase.asm","r")
     asm = h.readlines()
     instrs = []
    
