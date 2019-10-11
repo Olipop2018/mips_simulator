@@ -63,34 +63,6 @@ def instrSimulation(instrs):
             print(pc)
             print(pcprint)
 
-        elif(line[0:2] == "lb"): # lbu
-            line = line.replace("lb","")
-            line = line.replace(")","")
-            line = line.replace("(",",")
-            if(line[0:1] == "u"):
-               line = line.replace("u","")
-               op = '100100'
-            else:
-                op = '100000'
-            line = line.split(",")
-            if(line[1][0:2]== "0x"):
-                n=16
-            else:
-                n=10
-            imm = int(line[1],n) if (int(line[1],n) >= 0) else (65536 + int(line[1],n))
-            rs = int(registers[("$" + str(line[2]))])
-            rt = "$" + str(line[0])
-            mem = imm + rs
-            mem = mem - int('0x2000', 16)
-           
-            registers[rt] = int(memory[mem]) if (int(memory[mem]) > 0 or op == '100000') else (65536 + int(memory[mem]))
-            pc += 4# increments pc by 4 
-             
-            pcprint = hex(pc)
-            print(registers)# print all the registers and their values (testing purposes to see what is happening)
-            print(pc)
-            print(pcprint)
-       
         elif(line[0:2] == "sw"): # sw
             line = line.replace("sw","")
             line = line.replace(")","")
@@ -105,7 +77,22 @@ def instrSimulation(instrs):
             rt = registers[("$" + str(line[0]))]
             mem = imm + rs
             mem = mem - int('0x2000', 16)
+            rt= format(rt,'032b')
+            first= rt[:8]
+            sec= rt[8:16]
+            third= rt[16:24]
+            rt= rt[24:32]
+            first= int(first,2)
+            sec= int(sec,2)
+            third= int(third,2)
+            rt= int(rt,2)
             memory[mem] = rt
+            mem+=1
+            memory[mem] = third
+            mem+=1
+            memory[mem] = sec
+            mem+=1
+            memory[mem] = first
             pc+= 4# increments pc by 4 
              
             pcprint=  hex(pc)
@@ -127,6 +114,8 @@ def instrSimulation(instrs):
             rt = registers[("$" + str(line[0]))]
             mem = imm + rs
             mem = mem - int('0x2000', 16)
+            rt= format(rt,'08b')
+            rt= int(rt,2)
             memory[mem] = rt
             pc+= 4# increments pc by 4 
              
@@ -135,6 +124,37 @@ def instrSimulation(instrs):
             print(pc)
             print(pcprint)  
        
+        elif(line[0:2] == "lb"): # lbu
+            line = line.replace("lb","")
+            line = line.replace(")","")
+            line = line.replace("(",",")
+            if(line[0:1] == "u"):
+               line = line.replace("u","")
+               op = '100100'
+            else:
+                op = '100000'
+            line = line.split(",")
+            if(line[1][0:2]== "0x"):
+                n=16
+            else:
+                n=10
+            imm = int(line[1],n) if (int(line[1],n) >= 0) else (65536 + int(line[1],n))
+            rs = int(registers[("$" + str(line[2]))])
+            rt = "$" + str(line[0])
+            mem = imm + rs
+            mem = mem - int('0x2000', 16)
+            temp3 = int(memory[mem]) if (int(memory[mem]) > 0 or op == '100000') else (65536 + int(memory[mem]))
+            temp3 = format(temp3, '08b')
+            temp3 = int(temp3,2)
+            registers[rt] = temp3
+            pc += 4# increments pc by 4 
+             
+            pcprint = hex(pc)
+            print(registers)# print all the registers and their values (testing purposes to see what is happening)
+            print(pc)
+            print(pcprint)
+
+
         elif(line[0:3] == "beq"): # beq
             line = line.replace("beq","")
             line = line.split(",")
@@ -222,9 +242,11 @@ def instrSimulation(instrs):
             rs= int(rs) if (int(rs) > 0 or op == '011000') else (65536 + int(rs))
             rt= int(rt) if (int(rt) > 0 or op == '011000') else (65536 + int(rt))
             temp = rs * rt	#Multiply
-            registers["$hi"] = temp << 32		#Shift high right 32
-            registers["$hi"] = registers["$hi"] >> 32	#Shift back 32
-            registers["$lo"] = temp >> 32	#Shift low left 32
+            temp= format(temp,'064b')
+            hi=  int(temp[:32],2)
+            lo=  int(temp[32:],2)
+            registers["$hi"] = hi		#Shift high right 32
+            registers["$lo"] = lo	#Shift low left 32
             pc += 4# increments pc by 4 
              
             pcprint =  hex(pc)
@@ -265,10 +287,17 @@ def instrSimulation(instrs):
             else:
                 op= '001010'
             line = line.split(",")
-            imm = int(line[2]) if (int(line[2]) > 0 or op == '001010') else (65536 + int(line[2])) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
+            if(line[2][0:2]== "0x"):
+                n=16
+            else:
+                n=10
+            imm = int(line[2],n) if (int(line[2],n) > 0 or op == '001010') else (65536 + int(line[2],n)) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
             rs = registers[("$" + str(line[1]))] # reads the value from specified register
             rt = "$" + str(line[0]) # locate the register in which to write to
-            result = rs < imm # does the addition operation
+            if(rs < imm):
+                result = 1
+            else:
+                result = 0
             registers[rt]= result # writes the value to the register specified
             pc += 4 # increments pc by 4 
              
@@ -392,7 +421,7 @@ def saveJumpLabel(asm,labelIndex, labelName):
 
 def main():
    # f = open("mc.txt","w+")
-    h = open("testcase.asm","r")
+    h = open("Hash-MIPS-default.asm","r")
     asm = h.readlines()
     instrs = []
    
