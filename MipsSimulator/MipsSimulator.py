@@ -276,7 +276,7 @@ def instrSimulation(instrs):
             print(pc)
             print(pcprint)
 
-        elif(line[0:4] == "slti"): # SLT/U
+        elif(line[0:4] == "slti"): # SLTI/U
             line = line.replace("slti","")
             if(line[0:1] == "u"):
                line = line.replace("u","")
@@ -291,6 +291,8 @@ def instrSimulation(instrs):
             imm = int(line[2],n) if (int(line[2],n) > 0 or op == '001010') else (65536 + int(line[2],n)) # will get the negative or positive inter value. if unsigned and negative will get the unsigned value of th negative integer.
             rs = registers[("$" + str(line[1]))] # reads the value from specified register
             rt = "$" + str(line[0]) # locate the register in which to write to
+            temp = format(rs,'08b')
+            rs = int(temp[:8],2)
             if(rs < imm):
                 result = 1
             else:
@@ -418,7 +420,7 @@ def saveJumpLabel(asm,labelIndex, labelName):
 
 def main():
    # f = open("mc.txt","w+")
-    h = open("testcase.asm","r")
+    h = open("Hash-MIPS-default.asm","r")
     asm = h.readlines()
     instrs = []
    
