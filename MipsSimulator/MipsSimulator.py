@@ -497,7 +497,7 @@ def saveJumpLabel(asm,labelIndex, labelName):
 
 def main():
    # f = open("mc.txt","w+")
-    h = open("Hash-MIPS-plus","r")
+    h = open("Hash-MIPS-default.asm","r")
     asm = h.readlines()
     instrs = []
     FinalDIC= 0
