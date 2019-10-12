@@ -63,7 +63,7 @@ def instrSimulation(instrs, DIC, pc):
             rs = registers[("$" + str(line[1]))] # reads the value from specified register
             rt = "$" + str(line[0]) # locate the register in which to write to
             instruction = "addi" if(op == '001000') else "addiu"
-            print (instruction , rt ,("$" + str(line[1])), imm if(n== 10) else hex(imm), sep=',')
+            print (instruction , rt ,("$" + str(line[1])), imm if(n== 10) else hex(imm))
             result = rs + imm # does the addition operation
             registers[rt]= result # writes the value to the register specified
             print ("result:" ,rt ,"=",  hex(result))
@@ -502,6 +502,7 @@ def main():
     instrs = []
     FinalDIC= 0
     FinalPC= 0
+    
     for item in range(asm.count('\n')): # Remove all empty lines '\n'
         asm.remove('\n')
        
@@ -535,7 +536,13 @@ def main():
         print("memory", hex(mem)+": 0x"+ word )
     
     print("all register values:")
-    print(registers)
+    proregister= str(registers)
+    proregister= proregister.replace("'","")
+    proregister= proregister.replace("{","")
+    proregister= proregister.replace("}","")
+    proregister= proregister.replace(",",";")
+    #print(registers)
+    print(proregister)
     print("Final PC =",FinalPC)
     print("memory contents from 0x2000 - 0x2050:")
     for l in range(0,21):
